@@ -2,13 +2,17 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { ChevronLeft, Check, CreditCard, Banknote, Truck, Shield } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
+import { useAuth } from '@/hooks/useAuth';
+import { createOrder, generateOrderNumber } from '@/lib/orders';
 import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
 
 type PaymentMethod = 'cod' | 'bank';
 
 const CheckoutPage = () => {
   const navigate = useNavigate();
   const { state, getCartTotal, getItemDetails, clearCart } = useCart();
+  const { user } = useAuth();
 
   const [formData, setFormData] = useState({
     firstName: '',
@@ -42,25 +46,51 @@ const CheckoutPage = () => {
     }));
   };
 
-  const generateOrderId = () => {
-    return `ALS-${Date.now().toString(36).toUpperCase()}-${Math.random()
-      .toString(36)
-      .substring(2, 7)
-      .toUpperCase()}`;
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsProcessing(true);
 
-    // Simulate order processing
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+    try {
+      const orderNumber = generateOrderNumber();
+      
+      const orderItems = state.items.map(item => {
+        const product = getItemDetails(item.productId);
+        return {
+          productId: item.productId,
+          productName: product?.nameEn || 'Unknown Product',
+          size: item.size,
+          quantity: item.quantity,
+          price: item.price,
+        };
+      });
 
-    const newOrderId = generateOrderId();
-    setOrderId(newOrderId);
-    setOrderComplete(true);
-    clearCart();
-    setIsProcessing(false);
+      await createOrder({
+        userId: user?.id,
+        orderNumber,
+        subtotal,
+        shipping,
+        total,
+        paymentMethod: paymentMethod === 'cod' ? 'Cash on Delivery' : 'Bank Transfer',
+        shippingName: `${formData.firstName} ${formData.lastName}`,
+        shippingPhone: formData.phone,
+        shippingEmail: formData.email,
+        shippingAddress: formData.address,
+        shippingEmirate: formData.emirate,
+        shippingCity: formData.city,
+        notes: formData.notes,
+        items: orderItems,
+      });
+
+      setOrderId(orderNumber);
+      setOrderComplete(true);
+      clearCart();
+      toast.success('Order placed successfully!');
+    } catch (error) {
+      console.error('Error creating order:', error);
+      toast.error('Failed to place order. Please try again.');
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   const subtotal = getCartTotal();
