@@ -1,13 +1,14 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
+import { useLanguage } from '@/context/LanguageContext';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { User, Package, MapPin, Phone, Mail, Save } from 'lucide-react';
+import { User, Package, MapPin, Phone, Mail, Save, LogOut, ExternalLink } from 'lucide-react';
 import { toast } from 'sonner';
 import { countries, getRegionsByCountry } from '@/data/countries';
 
@@ -29,7 +30,8 @@ interface Order {
 }
 
 const ProfilePage = () => {
-  const { user, loading } = useAuth();
+  const { user, loading, signOut } = useAuth();
+  const { t } = useLanguage();
   const navigate = useNavigate();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [orders, setOrders] = useState<Order[]>([]);
@@ -104,6 +106,11 @@ const ProfilePage = () => {
     setSaving(false);
   };
 
+  const handleSignOut = async () => {
+    await signOut();
+    navigate('/');
+  };
+
   const getStatusBadge = (status: string) => {
     const colors: Record<string, string> = {
       pending: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
@@ -121,7 +128,7 @@ const ProfilePage = () => {
     return (
       <main className="min-h-screen pt-32 pb-20">
         <div className="container mx-auto px-4 text-center">
-          <div className="animate-pulse text-gold">Loading...</div>
+          <div className="animate-pulse text-gold">{t('common.loading')}</div>
         </div>
       </main>
     );
@@ -131,37 +138,37 @@ const ProfilePage = () => {
     <main className="min-h-screen pt-24 lg:pt-32 pb-20 bg-background">
       <div className="container mx-auto px-4 lg:px-8">
         <div className="mb-8">
-          <h1 className="text-4xl font-display font-semibold mb-2">My Account</h1>
-          <p className="font-arabic text-lg text-gold">حسابي</p>
+          <h1 className="text-4xl font-display font-semibold mb-2">{t('profile.title')}</h1>
+          <p className="font-arabic text-lg text-gold">{t('profile.subtitle')}</p>
         </div>
 
         <Tabs defaultValue="profile" className="space-y-6">
           <TabsList className="bg-card border border-border">
             <TabsTrigger value="profile" className="data-[state=active]:bg-gold data-[state=active]:text-primary">
               <User className="w-4 h-4 mr-2" />
-              Profile
+              {t('profile.tab.profile')}
             </TabsTrigger>
             <TabsTrigger value="orders" className="data-[state=active]:bg-gold data-[state=active]:text-primary">
               <Package className="w-4 h-4 mr-2" />
-              Orders
+              {t('profile.tab.orders')}
             </TabsTrigger>
           </TabsList>
 
           <TabsContent value="profile">
             <div className="bg-card border border-border p-6 max-w-2xl">
-              <h2 className="font-display text-xl mb-6">Personal Information</h2>
+              <h2 className="font-display text-xl mb-6">{t('profile.personal')}</h2>
               
               <div className="space-y-4">
                 <div>
                   <Label htmlFor="email" className="flex items-center gap-2">
-                    <Mail className="w-4 h-4" /> Email
+                    <Mail className="w-4 h-4" /> {t('profile.email')}
                   </Label>
                   <Input id="email" value={user?.email || ''} disabled className="mt-1 bg-muted" />
                 </div>
 
                 <div>
                   <Label htmlFor="full_name" className="flex items-center gap-2">
-                    <User className="w-4 h-4" /> Full Name
+                    <User className="w-4 h-4" /> {t('profile.fullName')}
                   </Label>
                   <Input
                     id="full_name"
@@ -173,7 +180,7 @@ const ProfilePage = () => {
 
                 <div>
                   <Label htmlFor="phone" className="flex items-center gap-2">
-                    <Phone className="w-4 h-4" /> Phone
+                    <Phone className="w-4 h-4" /> {t('profile.phone')}
                   </Label>
                   <Input
                     id="phone"
@@ -186,7 +193,7 @@ const ProfilePage = () => {
 
                 <div>
                   <Label htmlFor="country" className="flex items-center gap-2">
-                    <MapPin className="w-4 h-4" /> Country
+                    <MapPin className="w-4 h-4" /> {t('profile.country')}
                   </Label>
                   <Select value={selectedCountry} onValueChange={setSelectedCountry}>
                     <SelectTrigger className="mt-1">
@@ -204,10 +211,10 @@ const ProfilePage = () => {
 
                 {regions.length > 0 && (
                   <div>
-                    <Label htmlFor="emirate">Region / Governorate</Label>
+                    <Label htmlFor="emirate">{t('profile.region')}</Label>
                     <Select value={formData.emirate} onValueChange={(v) => setFormData({ ...formData, emirate: v })}>
                       <SelectTrigger className="mt-1">
-                        <SelectValue placeholder="Select region" />
+                        <SelectValue placeholder={t('profile.selectRegion')} />
                       </SelectTrigger>
                       <SelectContent>
                         {regions.map((region) => (
@@ -221,7 +228,7 @@ const ProfilePage = () => {
                 )}
 
                 <div>
-                  <Label htmlFor="city">City</Label>
+                  <Label htmlFor="city">{t('profile.city')}</Label>
                   <Input
                     id="city"
                     value={formData.city}
@@ -231,19 +238,31 @@ const ProfilePage = () => {
                 </div>
 
                 <div>
-                  <Label htmlFor="address">Address</Label>
+                  <Label htmlFor="address">{t('profile.address')}</Label>
                   <Input
                     id="address"
                     value={formData.address}
                     onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                     className="mt-1"
-                    placeholder="Street, building, apartment..."
+                    placeholder={t('profile.addressPlaceholder')}
                   />
                 </div>
 
                 <Button onClick={handleSave} disabled={saving} className="btn-gold mt-4">
                   <Save className="w-4 h-4 mr-2" />
-                  {saving ? 'Saving...' : 'Save Changes'}
+                  {saving ? t('profile.saving') : t('profile.save')}
+                </Button>
+              </div>
+
+              {/* Sign Out Button */}
+              <div className="mt-8 pt-6 border-t border-border">
+                <Button 
+                  onClick={handleSignOut} 
+                  variant="outline" 
+                  className="w-full text-destructive border-destructive hover:bg-destructive hover:text-destructive-foreground"
+                >
+                  <LogOut className="w-4 h-4 mr-2" />
+                  {t('profile.signOut')}
                 </Button>
               </div>
             </div>
@@ -251,10 +270,10 @@ const ProfilePage = () => {
 
           <TabsContent value="orders">
             <div className="bg-card border border-border p-6">
-              <h2 className="font-display text-xl mb-6">Order History</h2>
+              <h2 className="font-display text-xl mb-6">{t('profile.orderHistory')}</h2>
               
               {orders.length === 0 ? (
-                <p className="text-muted-foreground text-center py-8">No orders yet</p>
+                <p className="text-muted-foreground text-center py-8">{t('profile.noOrders')}</p>
               ) : (
                 <div className="space-y-4">
                   {orders.map((order) => (
@@ -270,6 +289,12 @@ const ProfilePage = () => {
                           {order.status}
                         </span>
                         <span className="text-gold font-medium">${order.total.toFixed(2)}</span>
+                        <Link 
+                          to={`/track-order?order=${order.order_number}`}
+                          className="text-sm text-muted-foreground hover:text-gold flex items-center gap-1"
+                        >
+                          <ExternalLink className="w-4 h-4" />
+                        </Link>
                       </div>
                     </div>
                   ))}
