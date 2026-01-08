@@ -52,7 +52,7 @@ const Footer = () => {
           {/* Contact */}
           <div>
             <h4 className="text-sm font-semibold tracking-widest uppercase mb-6">
-              Contact Us
+              +90 531 514 06 38
             </h4>
             <ul className="space-y-4">
               <li className="flex items-start gap-3">
