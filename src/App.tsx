@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "next-themes";
 import { CartProvider } from "@/context/CartContext";
 import { AuthProvider } from "@/hooks/useAuth";
+import { LanguageProvider } from "@/context/LanguageContext";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import CartDrawer from "@/components/cart/CartDrawer";
@@ -19,6 +20,7 @@ import ContactPage from "@/pages/ContactPage";
 import AuthPage from "@/pages/AuthPage";
 import AdminPage from "@/pages/AdminPage";
 import ProfilePage from "@/pages/ProfilePage";
+import OrderTrackingPage from "@/pages/OrderTrackingPage";
 import NotFound from "@/pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -26,32 +28,35 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
-      <TooltipProvider>
-        <AuthProvider>
-          <CartProvider>
-            <Toaster />
-            <Sonner />
-            <BrowserRouter>
-              <Header />
-              <CartDrawer />
-              <Routes>
-                <Route path="/" element={<HomePage />} />
-                <Route path="/shop" element={<ShopPage />} />
-                <Route path="/product/:slug" element={<ProductDetailPage />} />
-                <Route path="/cart" element={<CartPage />} />
-                <Route path="/checkout" element={<CheckoutPage />} />
-                <Route path="/about" element={<AboutPage />} />
-                <Route path="/contact" element={<ContactPage />} />
-                <Route path="/auth" element={<AuthPage />} />
-                <Route path="/admin" element={<AdminPage />} />
-                <Route path="/profile" element={<ProfilePage />} />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-              <Footer />
-            </BrowserRouter>
-          </CartProvider>
-        </AuthProvider>
-      </TooltipProvider>
+      <LanguageProvider>
+        <TooltipProvider>
+          <AuthProvider>
+            <CartProvider>
+              <Toaster />
+              <Sonner />
+              <BrowserRouter>
+                <Header />
+                <CartDrawer />
+                <Routes>
+                  <Route path="/" element={<HomePage />} />
+                  <Route path="/shop" element={<ShopPage />} />
+                  <Route path="/product/:slug" element={<ProductDetailPage />} />
+                  <Route path="/cart" element={<CartPage />} />
+                  <Route path="/checkout" element={<CheckoutPage />} />
+                  <Route path="/about" element={<AboutPage />} />
+                  <Route path="/contact" element={<ContactPage />} />
+                  <Route path="/auth" element={<AuthPage />} />
+                  <Route path="/admin" element={<AdminPage />} />
+                  <Route path="/profile" element={<ProfilePage />} />
+                  <Route path="/track-order" element={<OrderTrackingPage />} />
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+                <Footer />
+              </BrowserRouter>
+            </CartProvider>
+          </AuthProvider>
+        </TooltipProvider>
+      </LanguageProvider>
     </ThemeProvider>
   </QueryClientProvider>
 );

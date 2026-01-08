@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, ShoppingBag, Search, User, LogOut, Shield, UserCircle } from 'lucide-react';
+import { Menu, X, ShoppingBag, Search, User, Shield, UserCircle, Package } from 'lucide-react';
 import ThemeToggle from '@/components/ThemeToggle';
+import LanguageToggle from '@/components/LanguageToggle';
 import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/hooks/useAuth';
+import { useLanguage } from '@/context/LanguageContext';
 import { supabase } from '@/integrations/supabase/client';
 import { cn } from '@/lib/utils';
 
@@ -12,7 +14,8 @@ const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const { getCartCount, openCart } = useCart();
-  const { user, signOut } = useAuth();
+  const { user } = useAuth();
+  const { t, isRTL } = useLanguage();
   const location = useLocation();
   const cartCount = getCartCount();
 
@@ -48,10 +51,10 @@ const Header = () => {
   }, [location]);
 
   const navLinks = [
-    { href: '/', label: 'Home' },
-    { href: '/shop', label: 'Shop' },
-    { href: '/about', label: 'About' },
-    { href: '/contact', label: 'Contact' },
+    { href: '/', label: t('nav.home') },
+    { href: '/shop', label: t('nav.shop') },
+    { href: '/about', label: t('nav.about') },
+    { href: '/contact', label: t('nav.contact') },
   ];
 
   const isHomePage = location.pathname === '/';
@@ -69,9 +72,9 @@ const Header = () => {
       )}
     >
       <div className="container mx-auto px-4 lg:px-8">
-        <div className="flex items-center justify-between h-20 lg:h-24">
+        <div className={cn("flex items-center justify-between h-20 lg:h-24", isRTL && "flex-row-reverse")}>
           {/* Logo */}
-          <Link to="/" className="flex flex-col items-start">
+          <Link to="/" className={cn("flex flex-col", isRTL ? "items-end" : "items-start")}>
             <span className={cn(
               'text-xl lg:text-2xl font-display font-semibold tracking-ultra-wide transition-colors duration-300',
               logoColor
@@ -87,7 +90,7 @@ const Header = () => {
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center gap-10">
+          <nav className={cn("hidden lg:flex items-center gap-10", isRTL && "flex-row-reverse")}>
             {navLinks.map((link) => (
               <Link
                 key={link.href}
@@ -104,7 +107,7 @@ const Header = () => {
           </nav>
 
           {/* Right Actions */}
-          <div className="flex items-center gap-4 lg:gap-6">
+          <div className={cn("flex items-center gap-4 lg:gap-6", isRTL && "flex-row-reverse")}>
             <button
               className={cn(
                 'hidden lg:block transition-colors duration-300 hover:text-gold',
@@ -125,11 +128,31 @@ const Header = () => {
             >
               <ShoppingBag className="w-5 h-5" />
               {cartCount > 0 && (
-                <span className="absolute -top-2 -right-2 bg-gold text-primary text-[10px] font-semibold w-5 h-5 rounded-full flex items-center justify-center">
+                <span className={cn(
+                  "absolute -top-2 bg-gold text-primary text-[10px] font-semibold w-5 h-5 rounded-full flex items-center justify-center",
+                  isRTL ? "-left-2" : "-right-2"
+                )}>
                   {cartCount}
                 </span>
               )}
             </button>
+
+            {/* Track Order Link */}
+            <Link
+              to="/track-order"
+              className={cn(
+                'hidden lg:flex items-center gap-2 transition-colors duration-300 hover:text-gold text-sm',
+                textColor
+              )}
+              aria-label={t('nav.trackOrder')}
+            >
+              <Package className="w-5 h-5" />
+            </Link>
+
+            {/* Language Toggle */}
+            <div className="hidden lg:block">
+              <LanguageToggle className={textColor} />
+            </div>
 
             {/* Theme Toggle */}
             <div className="hidden lg:block">
@@ -152,28 +175,16 @@ const Header = () => {
 
             {/* User Profile & Auth */}
             {user ? (
-              <div className="hidden lg:flex items-center gap-4">
-                <Link
-                  to="/profile"
-                  className={cn(
-                    'flex items-center gap-2 transition-colors duration-300 hover:text-gold text-sm',
-                    textColor
-                  )}
-                  aria-label="Profile"
-                >
-                  <UserCircle className="w-5 h-5" />
-                </Link>
-                <button
-                  onClick={() => signOut()}
-                  className={cn(
-                    'flex items-center gap-2 transition-colors duration-300 hover:text-gold text-sm',
-                    textColor
-                  )}
-                  aria-label="Sign Out"
-                >
-                  <LogOut className="w-5 h-5" />
-                </button>
-              </div>
+              <Link
+                to="/profile"
+                className={cn(
+                  'hidden lg:flex items-center gap-2 transition-colors duration-300 hover:text-gold text-sm',
+                  textColor
+                )}
+                aria-label="Profile"
+              >
+                <UserCircle className="w-5 h-5" />
+              </Link>
             ) : (
               <Link
                 to="/auth"
@@ -220,9 +231,19 @@ const Header = () => {
               {link.label}
             </Link>
           ))}
+
+          {/* Track Order Mobile */}
+          <Link
+            to="/track-order"
+            className="text-2xl font-display tracking-widest uppercase transition-all duration-300 hover:text-gold text-foreground animate-fade-in"
+            style={{ animationDelay: `${navLinks.length * 100}ms` }}
+          >
+            {t('nav.trackOrder')}
+          </Link>
           
-          {/* Mobile Theme Toggle */}
-          <div className="animate-fade-in" style={{ animationDelay: `${navLinks.length * 100}ms` }}>
+          {/* Mobile Language & Theme Toggle */}
+          <div className="flex items-center gap-4 animate-fade-in" style={{ animationDelay: `${(navLinks.length + 1) * 100}ms` }}>
+            <LanguageToggle />
             <ThemeToggle />
           </div>
 
@@ -231,37 +252,28 @@ const Header = () => {
             <Link
               to="/admin"
               className="text-2xl font-display tracking-widest uppercase transition-all duration-300 hover:text-gold text-gold animate-fade-in"
-              style={{ animationDelay: `${(navLinks.length + 1) * 100}ms` }}
+              style={{ animationDelay: `${(navLinks.length + 2) * 100}ms` }}
             >
-              لوحة التحكم
+              {t('nav.admin')}
             </Link>
           )}
           
           {/* Mobile Profile & Auth Links */}
           {user ? (
-            <>
-              <Link
-                to="/profile"
-                className="text-2xl font-display tracking-widest uppercase transition-all duration-300 hover:text-gold text-foreground animate-fade-in"
-                style={{ animationDelay: `${(navLinks.length + (isAdmin ? 2 : 1)) * 100}ms` }}
-              >
-                حسابي
-              </Link>
-              <button
-                onClick={() => signOut()}
-                className="text-2xl font-display tracking-widest uppercase transition-all duration-300 hover:text-gold text-foreground animate-fade-in"
-                style={{ animationDelay: `${(navLinks.length + (isAdmin ? 3 : 2)) * 100}ms` }}
-              >
-                تسجيل خروج
-              </button>
-            </>
+            <Link
+              to="/profile"
+              className="text-2xl font-display tracking-widest uppercase transition-all duration-300 hover:text-gold text-foreground animate-fade-in"
+              style={{ animationDelay: `${(navLinks.length + (isAdmin ? 3 : 2)) * 100}ms` }}
+            >
+              {t('nav.profile')}
+            </Link>
           ) : (
             <Link
               to="/auth"
               className="text-2xl font-display tracking-widest uppercase transition-all duration-300 hover:text-gold text-foreground animate-fade-in"
-              style={{ animationDelay: `${(navLinks.length + 1) * 100}ms` }}
+              style={{ animationDelay: `${(navLinks.length + 2) * 100}ms` }}
             >
-              تسجيل دخول
+              {t('nav.signIn')}
             </Link>
           )}
         </nav>
