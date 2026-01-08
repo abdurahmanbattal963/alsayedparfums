@@ -18,9 +18,9 @@ const ProductCard = ({ product, index = 0 }: ProductCardProps) => {
   const defaultSize = product.sizes[0];
 
   const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('en-AE', {
+    return new Intl.NumberFormat('en-US', {
       style: 'currency',
-      currency: 'AED',
+      currency: 'USD',
     }).format(price);
   };
 

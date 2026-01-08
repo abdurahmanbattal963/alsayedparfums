@@ -27,9 +27,9 @@ const CheckoutPage = () => {
   const [orderId, setOrderId] = useState('');
 
   const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('en-AE', {
+    return new Intl.NumberFormat('en-US', {
       style: 'currency',
-      currency: 'AED',
+      currency: 'USD',
     }).format(price);
   };
 
@@ -64,7 +64,7 @@ const CheckoutPage = () => {
   };
 
   const subtotal = getCartTotal();
-  const shipping = subtotal >= 500 ? 0 : 50;
+  const shipping = subtotal >= 300 ? 0 : 25;
   const total = subtotal + shipping;
 
   if (state.items.length === 0 && !orderComplete) {
@@ -403,7 +403,7 @@ const CheckoutPage = () => {
                   </div>
                   <div className="flex items-center gap-2 text-xs text-muted-foreground">
                     <Truck className="w-4 h-4 text-gold" />
-                    <span>Free shipping over AED 500</span>
+                    <span>Free shipping over $300</span>
                   </div>
                 </div>
               </div>

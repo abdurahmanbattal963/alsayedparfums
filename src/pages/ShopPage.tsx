@@ -214,7 +214,7 @@ const ShopPage = () => {
                   />
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  AED {priceRange[0]} - AED {priceRange[1]}
+                  ${priceRange[0]} - ${priceRange[1]}
                 </p>
               </div>
             </div>
