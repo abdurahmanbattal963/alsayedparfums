@@ -38,9 +38,9 @@ const ProductDetailPage = () => {
     .slice(0, 4);
 
   const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('en-AE', {
+    return new Intl.NumberFormat('en-US', {
       style: 'currency',
-      currency: 'AED',
+      currency: 'USD',
     }).format(price);
   };
 
@@ -63,7 +63,7 @@ const ProductDetailPage = () => {
   }[product.category];
 
   const guarantees = [
-    { icon: Truck, text: 'Free luxury delivery over AED 500' },
+    { icon: Truck, text: 'Free luxury delivery over $300' },
     { icon: Shield, text: '100% authentic guarantee' },
     { icon: RotateCcw, text: '14-day return policy' },
   ];

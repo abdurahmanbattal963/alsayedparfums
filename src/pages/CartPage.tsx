@@ -6,9 +6,9 @@ const CartPage = () => {
   const { state, removeItem, updateQuantity, getCartTotal, getItemDetails } = useCart();
 
   const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('en-AE', {
+    return new Intl.NumberFormat('en-US', {
       style: 'currency',
-      currency: 'AED',
+      currency: 'USD',
     }).format(price);
   };
 
@@ -33,7 +33,7 @@ const CartPage = () => {
   }
 
   const subtotal = getCartTotal();
-  const shipping = subtotal >= 500 ? 0 : 50;
+  const shipping = subtotal >= 300 ? 0 : 25;
   const total = subtotal + shipping;
 
   return (
@@ -143,7 +143,7 @@ const CartPage = () => {
                 </div>
                 {shipping === 0 && (
                   <p className="text-xs text-gold">
-                    ✓ Free shipping on orders over AED 500
+                    ✓ Free shipping on orders over $300
                   </p>
                 )}
               </div>

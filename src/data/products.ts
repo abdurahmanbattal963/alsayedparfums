@@ -1,3 +1,12 @@
+import royalOudImg from '@/assets/products/royal-oud.jpg';
+import velvetRoseImg from '@/assets/products/velvet-rose.jpg';
+import arabianNightsImg from '@/assets/products/arabian-nights.jpg';
+import imperialSaffronImg from '@/assets/products/imperial-saffron.jpg';
+import midnightJasmineImg from '@/assets/products/midnight-jasmine.jpg';
+import amberElixirImg from '@/assets/products/amber-elixir.jpg';
+import platinumMuskImg from '@/assets/products/platinum-musk.jpg';
+import goldenOrchidImg from '@/assets/products/golden-orchid.jpg';
+
 export interface ProductSize {
   size: string;
   price: number;
@@ -33,10 +42,10 @@ export const products: Product[] = [
     heartNotes: ["Bulgarian Rose", "Jasmine Absolute", "Orris"],
     baseNotes: ["Aged Sandalwood", "Amber", "Musk", "Vanilla"],
     sizes: [
-      { size: "50ml", price: 450, stock: 15 },
-      { size: "100ml", price: 750, stock: 10 },
+      { size: "50ml", price: 245, stock: 15 },
+      { size: "100ml", price: 395, stock: 10 },
     ],
-    images: ["/placeholder.svg", "/placeholder.svg", "/placeholder.svg", "/placeholder.svg"],
+    images: [royalOudImg, royalOudImg, royalOudImg, royalOudImg],
     featured: true,
     createdAt: "2024-01-15",
     updatedAt: "2024-01-15"
@@ -52,10 +61,10 @@ export const products: Product[] = [
     heartNotes: ["Turkish Rose", "Dark Plum", "Violet"],
     baseNotes: ["Oud", "Patchouli", "Benzoin", "Amber"],
     sizes: [
-      { size: "50ml", price: 380, stock: 20 },
-      { size: "100ml", price: 650, stock: 12 },
+      { size: "50ml", price: 195, stock: 20 },
+      { size: "100ml", price: 325, stock: 12 },
     ],
-    images: ["/placeholder.svg", "/placeholder.svg", "/placeholder.svg", "/placeholder.svg"],
+    images: [velvetRoseImg, velvetRoseImg, velvetRoseImg, velvetRoseImg],
     featured: true,
     createdAt: "2024-01-10",
     updatedAt: "2024-01-10"
@@ -71,10 +80,10 @@ export const products: Product[] = [
     heartNotes: ["Myrrh", "Rose", "Incense"],
     baseNotes: ["Leather", "Oud", "Amber", "Vanilla"],
     sizes: [
-      { size: "50ml", price: 520, stock: 8 },
-      { size: "100ml", price: 890, stock: 5 },
+      { size: "50ml", price: 275, stock: 8 },
+      { size: "100ml", price: 450, stock: 5 },
     ],
-    images: ["/placeholder.svg", "/placeholder.svg", "/placeholder.svg", "/placeholder.svg"],
+    images: [arabianNightsImg, arabianNightsImg, arabianNightsImg, arabianNightsImg],
     featured: true,
     createdAt: "2024-01-05",
     updatedAt: "2024-01-05"
@@ -90,10 +99,10 @@ export const products: Product[] = [
     heartNotes: ["Leather", "Tobacco", "Rose"],
     baseNotes: ["Oud", "Sandalwood", "Musk", "Tonka Bean"],
     sizes: [
-      { size: "50ml", price: 420, stock: 18 },
-      { size: "100ml", price: 720, stock: 9 },
+      { size: "50ml", price: 225, stock: 18 },
+      { size: "100ml", price: 375, stock: 9 },
     ],
-    images: ["/placeholder.svg", "/placeholder.svg", "/placeholder.svg", "/placeholder.svg"],
+    images: [imperialSaffronImg, imperialSaffronImg, imperialSaffronImg, imperialSaffronImg],
     featured: false,
     createdAt: "2024-02-01",
     updatedAt: "2024-02-01"
@@ -109,10 +118,10 @@ export const products: Product[] = [
     heartNotes: ["Indian Jasmine", "Tuberose", "Ylang-Ylang"],
     baseNotes: ["Sandalwood", "White Musk", "Vanilla", "Cedar"],
     sizes: [
-      { size: "50ml", price: 340, stock: 25 },
-      { size: "100ml", price: 580, stock: 15 },
+      { size: "50ml", price: 175, stock: 25 },
+      { size: "100ml", price: 295, stock: 15 },
     ],
-    images: ["/placeholder.svg", "/placeholder.svg", "/placeholder.svg", "/placeholder.svg"],
+    images: [midnightJasmineImg, midnightJasmineImg, midnightJasmineImg, midnightJasmineImg],
     featured: true,
     createdAt: "2024-02-10",
     updatedAt: "2024-02-10"
@@ -128,10 +137,10 @@ export const products: Product[] = [
     heartNotes: ["Cardamom", "Cinnamon", "Nutmeg"],
     baseNotes: ["Benzoin", "Labdanum", "Vetiver", "Oud"],
     sizes: [
-      { size: "50ml", price: 390, stock: 22 },
-      { size: "100ml", price: 670, stock: 11 },
+      { size: "50ml", price: 199, stock: 22 },
+      { size: "100ml", price: 345, stock: 11 },
     ],
-    images: ["/placeholder.svg", "/placeholder.svg", "/placeholder.svg", "/placeholder.svg"],
+    images: [amberElixirImg, amberElixirImg, amberElixirImg, amberElixirImg],
     featured: false,
     createdAt: "2024-02-15",
     updatedAt: "2024-02-15"
@@ -147,10 +156,10 @@ export const products: Product[] = [
     heartNotes: ["Violet Leaf", "Iris", "Geranium"],
     baseNotes: ["White Musk", "Sandalwood", "Ambergris", "Cedar"],
     sizes: [
-      { size: "50ml", price: 360, stock: 30 },
-      { size: "100ml", price: 620, stock: 18 },
+      { size: "50ml", price: 185, stock: 30 },
+      { size: "100ml", price: 315, stock: 18 },
     ],
-    images: ["/placeholder.svg", "/placeholder.svg", "/placeholder.svg", "/placeholder.svg"],
+    images: [platinumMuskImg, platinumMuskImg, platinumMuskImg, platinumMuskImg],
     featured: false,
     createdAt: "2024-03-01",
     updatedAt: "2024-03-01"
@@ -166,10 +175,10 @@ export const products: Product[] = [
     heartNotes: ["Jasmine", "Magnolia", "Ylang-Ylang"],
     baseNotes: ["Vanilla", "Patchouli", "Sandalwood", "Musk"],
     sizes: [
-      { size: "50ml", price: 410, stock: 16 },
-      { size: "100ml", price: 700, stock: 8 },
+      { size: "50ml", price: 215, stock: 16 },
+      { size: "100ml", price: 365, stock: 8 },
     ],
-    images: ["/placeholder.svg", "/placeholder.svg", "/placeholder.svg", "/placeholder.svg"],
+    images: [goldenOrchidImg, goldenOrchidImg, goldenOrchidImg, goldenOrchidImg],
     featured: false,
     createdAt: "2024-03-10",
     updatedAt: "2024-03-10"
