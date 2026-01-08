@@ -4,76 +4,64 @@ import ProductCard from '@/components/product/ProductCard';
 import { getFeaturedProducts } from '@/data/products';
 import heroBg from '@/assets/hero-bg.jpg';
 import heroPerfume from '@/assets/hero-perfume.jpg';
-
 const HomePage = () => {
   const featuredProducts = getFeaturedProducts();
-
-  const features = [
-    {
-      icon: Sparkles,
-      title: 'Premium Quality',
-      titleAr: 'جودة فائقة',
-      description: 'Only the finest ingredients sourced from around the world',
-    },
-    {
-      icon: Shield,
-      title: 'Authenticity Guaranteed',
-      titleAr: 'أصالة مضمونة',
-      description: '100% authentic fragrances with certificate of origin',
-    },
-    {
-      icon: Truck,
-      title: 'Luxury Delivery',
-      titleAr: 'توصيل فاخر',
-      description: 'Premium packaging and white-glove delivery service',
-    },
-    {
-      icon: Award,
-      title: 'Expert Curation',
-      titleAr: 'اختيار متخصص',
-      description: 'Hand-selected by world-renowned perfume experts',
-    },
-  ];
-
-  return (
-    <main className="min-h-screen">
+  const features = [{
+    icon: Sparkles,
+    title: 'Premium Quality',
+    titleAr: 'جودة فائقة',
+    description: 'Only the finest ingredients sourced from around the world'
+  }, {
+    icon: Shield,
+    title: 'Authenticity Guaranteed',
+    titleAr: 'أصالة مضمونة',
+    description: '100% authentic fragrances with certificate of origin'
+  }, {
+    icon: Truck,
+    title: 'Luxury Delivery',
+    titleAr: 'توصيل فاخر',
+    description: 'Premium packaging and white-glove delivery service'
+  }, {
+    icon: Award,
+    title: 'Expert Curation',
+    titleAr: 'اختيار متخصص',
+    description: 'Hand-selected by world-renowned perfume experts'
+  }];
+  return <main className="min-h-screen">
       {/* Hero Section */}
       <section className="relative h-screen flex items-center justify-center overflow-hidden">
         {/* Background Image */}
         <div className="absolute inset-0">
-          <img
-            src={heroBg}
-            alt="Luxury Perfume Boutique"
-            className="w-full h-full object-cover"
-          />
+          <img src={heroBg} alt="Luxury Perfume Boutique" className="w-full h-full object-cover" />
           <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-black/30" />
         </div>
 
         {/* Content */}
         <div className="relative z-10 container mx-auto px-4 lg:px-8">
           <div className="max-w-3xl">
-            <p className="text-gold font-arabic text-xl mb-4 animate-fade-in opacity-0" style={{ animationDelay: '0.2s', animationFillMode: 'forwards' }}>
+            <p className="text-gold font-arabic text-xl mb-4 animate-fade-in opacity-0" style={{
+            animationDelay: '0.2s',
+            animationFillMode: 'forwards'
+          }}>
               عطور تُجسد الفخامة والذوق الرفيع
             </p>
-            <h1 className="text-5xl md:text-7xl lg:text-8xl font-display font-bold text-white mb-6 tracking-wide animate-fade-in opacity-0" style={{ animationDelay: '0.4s', animationFillMode: 'forwards' }}>
+            <h1 className="text-5xl md:text-7xl lg:text-8xl font-display font-bold text-white mb-6 tracking-wide animate-fade-in opacity-0" style={{
+            animationDelay: '0.4s',
+            animationFillMode: 'forwards'
+          }}>
               ALSAYED
               <span className="block text-gold">PERFUMES</span>
             </h1>
-            <p className="text-lg md:text-xl text-white/80 mb-10 max-w-xl leading-relaxed animate-fade-in opacity-0" style={{ animationDelay: '0.6s', animationFillMode: 'forwards' }}>
-              Experience the pinnacle of luxury fragrance. Each scent is a masterpiece, crafted for those who appreciate the finer things in life.
-            </p>
-            <div className="flex flex-wrap gap-4 animate-fade-in opacity-0" style={{ animationDelay: '0.8s', animationFillMode: 'forwards' }}>
-              <Link
-                to="/shop"
-                className="btn-gold group inline-flex items-center gap-3"
-              >
+            
+            <div className="flex flex-wrap gap-4 animate-fade-in opacity-0" style={{
+            animationDelay: '0.8s',
+            animationFillMode: 'forwards'
+          }}>
+              <Link to="/shop" className="btn-gold group inline-flex items-center gap-3">
                 Explore Collection
                 <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
               </Link>
-              <Link
-                to="/about"
-                className="btn-outline-gold border-white text-white hover:bg-white hover:text-primary"
-              >
+              <Link to="/about" className="btn-outline-gold border-white text-white hover:bg-white hover:text-primary">
                 Our Story
               </Link>
             </div>
@@ -106,21 +94,14 @@ const HomePage = () => {
               <p className="font-arabic text-lg text-gold mb-8">
                 كل قطرة تحكي قصة من الفخامة والتميز
               </p>
-              <Link
-                to="/about"
-                className="btn-luxury inline-flex items-center gap-3 group"
-              >
+              <Link to="/about" className="btn-luxury inline-flex items-center gap-3 group">
                 <span className="relative z-10">Discover Our Heritage</span>
                 <ArrowRight className="relative z-10 w-4 h-4 transition-transform group-hover:translate-x-1" />
               </Link>
             </div>
             <div className="relative">
               <div className="aspect-square bg-muted rounded overflow-hidden shadow-luxury">
-                <img
-                  src={heroPerfume}
-                  alt="Signature Perfume"
-                  className="w-full h-full object-cover"
-                />
+                <img src={heroPerfume} alt="Signature Perfume" className="w-full h-full object-cover" />
               </div>
               {/* Decorative Elements */}
               <div className="absolute -top-6 -left-6 w-24 h-24 border-2 border-gold/20" />
@@ -147,16 +128,11 @@ const HomePage = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {featuredProducts.map((product, index) => (
-              <ProductCard key={product.id} product={product} index={index} />
-            ))}
+            {featuredProducts.map((product, index) => <ProductCard key={product.id} product={product} index={index} />)}
           </div>
 
           <div className="text-center mt-16">
-            <Link
-              to="/shop"
-              className="btn-luxury inline-flex items-center gap-3 group"
-            >
+            <Link to="/shop" className="btn-luxury inline-flex items-center gap-3 group">
               <span className="relative z-10">View All Collection</span>
               <ArrowRight className="relative z-10 w-4 h-4 transition-transform group-hover:translate-x-1" />
             </Link>
@@ -180,12 +156,9 @@ const HomePage = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {features.map((feature, index) => (
-              <div
-                key={feature.title}
-                className="text-center p-8 border border-primary-foreground/10 hover:border-gold/50 transition-all duration-500 animate-fade-in group"
-                style={{ animationDelay: `${index * 100}ms` }}
-              >
+            {features.map((feature, index) => <div key={feature.title} className="text-center p-8 border border-primary-foreground/10 hover:border-gold/50 transition-all duration-500 animate-fade-in group" style={{
+            animationDelay: `${index * 100}ms`
+          }}>
                 <div className="inline-flex items-center justify-center w-16 h-16 mb-6 border border-gold/30 group-hover:border-gold transition-colors duration-500">
                   <feature.icon className="w-7 h-7 text-gold" />
                 </div>
@@ -194,8 +167,7 @@ const HomePage = () => {
                 <p className="text-sm text-primary-foreground/60 leading-relaxed">
                   {feature.description}
                 </p>
-              </div>
-            ))}
+              </div>)}
           </div>
         </div>
       </section>
@@ -229,8 +201,6 @@ const HomePage = () => {
           </div>
         </div>
       </section>
-    </main>
-  );
+    </main>;
 };
-
 export default HomePage;
