@@ -1,13 +1,15 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, ShoppingBag, Search } from 'lucide-react';
+import { Menu, X, ShoppingBag, Search, User, LogOut } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
+import { useAuth } from '@/hooks/useAuth';
 import { cn } from '@/lib/utils';
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { getCartCount, openCart } = useCart();
+  const { user, signOut } = useAuth();
   const location = useLocation();
   const cartCount = getCartCount();
 
@@ -108,6 +110,30 @@ const Header = () => {
               )}
             </button>
 
+            {/* Auth Button */}
+            {user ? (
+              <button
+                onClick={() => signOut()}
+                className={cn(
+                  'hidden lg:flex items-center gap-2 transition-colors duration-300 hover:text-gold text-sm',
+                  textColor
+                )}
+                aria-label="Sign Out"
+              >
+                <LogOut className="w-5 h-5" />
+              </button>
+            ) : (
+              <Link
+                to="/auth"
+                className={cn(
+                  'hidden lg:flex items-center gap-2 transition-colors duration-300 hover:text-gold text-sm',
+                  textColor
+                )}
+              >
+                <User className="w-5 h-5" />
+              </Link>
+            )}
+
             {/* Mobile Menu Toggle */}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -142,6 +168,25 @@ const Header = () => {
               {link.label}
             </Link>
           ))}
+          
+          {/* Mobile Auth Link */}
+          {user ? (
+            <button
+              onClick={() => signOut()}
+              className="text-2xl font-display tracking-widest uppercase transition-all duration-300 hover:text-gold text-foreground animate-fade-in"
+              style={{ animationDelay: `${navLinks.length * 100}ms` }}
+            >
+              تسجيل خروج
+            </button>
+          ) : (
+            <Link
+              to="/auth"
+              className="text-2xl font-display tracking-widest uppercase transition-all duration-300 hover:text-gold text-foreground animate-fade-in"
+              style={{ animationDelay: `${navLinks.length * 100}ms` }}
+            >
+              تسجيل دخول
+            </Link>
+          )}
         </nav>
       </div>
     </header>
