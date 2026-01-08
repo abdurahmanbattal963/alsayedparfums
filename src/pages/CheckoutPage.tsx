@@ -6,6 +6,8 @@ import { useAuth } from '@/hooks/useAuth';
 import { createOrder, generateOrderNumber } from '@/lib/orders';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
+import { countries } from '@/data/countries';
 
 type PaymentMethod = 'cod' | 'bank';
 
@@ -14,6 +16,8 @@ const CheckoutPage = () => {
   const { state, getCartTotal, getItemDetails, clearCart } = useCart();
   const { user } = useAuth();
 
+  const defaultCountry = countries[0]; // Syria is first in the list
+  
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -21,7 +25,7 @@ const CheckoutPage = () => {
     phone: '',
     address: '',
     city: '',
-    emirate: '',
+    country: defaultCountry.code,
     notes: '',
   });
 
@@ -64,6 +68,8 @@ const CheckoutPage = () => {
         };
       });
 
+      const selectedCountry = countries.find(c => c.code === formData.country);
+      
       await createOrder({
         userId: user?.id,
         orderNumber,
@@ -75,11 +81,38 @@ const CheckoutPage = () => {
         shippingPhone: formData.phone,
         shippingEmail: formData.email,
         shippingAddress: formData.address,
-        shippingEmirate: formData.emirate,
+        shippingEmirate: selectedCountry?.nameEn || formData.country,
         shippingCity: formData.city,
         notes: formData.notes,
         items: orderItems,
       });
+
+      // Send order confirmation email
+      try {
+        const shippingAddress = `${formData.address}, ${formData.city}, ${selectedCountry?.nameEn || formData.country}`;
+        await supabase.functions.invoke('send-order-confirmation', {
+          body: {
+            customerName: `${formData.firstName} ${formData.lastName}`,
+            customerEmail: formData.email,
+            orderNumber,
+            items: orderItems.map(item => ({
+              productName: item.productName,
+              size: item.size,
+              quantity: item.quantity,
+              price: item.price,
+            })),
+            subtotal,
+            shipping,
+            total,
+            shippingAddress,
+            paymentMethod: paymentMethod === 'cod' ? 'Cash on Delivery' : 'Bank Transfer',
+          },
+        });
+        console.log('Order confirmation email sent');
+      } catch (emailError) {
+        console.error('Failed to send confirmation email:', emailError);
+        // Don't fail the order if email fails
+      }
 
       setOrderId(orderNumber);
       setOrderComplete(true);
@@ -138,15 +171,7 @@ const CheckoutPage = () => {
     );
   }
 
-  const emirates = [
-    'Abu Dhabi',
-    'Dubai',
-    'Sharjah',
-    'Ajman',
-    'Umm Al Quwain',
-    'Ras Al Khaimah',
-    'Fujairah',
-  ];
+  const selectedCountry = countries.find(c => c.code === formData.country);
 
   return (
     <main className="min-h-screen pt-24 lg:pt-32 pb-20 bg-background">
@@ -264,19 +289,18 @@ const CheckoutPage = () => {
                     </div>
                     <div>
                       <label className="block text-sm text-muted-foreground mb-2">
-                        Emirate *
+                        Country *
                       </label>
                       <select
-                        name="emirate"
-                        value={formData.emirate}
+                        name="country"
+                        value={formData.country}
                         onChange={handleInputChange}
                         required
                         className="w-full px-4 py-3 bg-background border border-border focus:border-gold focus:outline-none transition-colors"
                       >
-                        <option value="">Select Emirate</option>
-                        {emirates.map((emirate) => (
-                          <option key={emirate} value={emirate}>
-                            {emirate}
+                        {countries.map((country) => (
+                          <option key={country.code} value={country.code}>
+                            {country.nameEn}
                           </option>
                         ))}
                       </select>

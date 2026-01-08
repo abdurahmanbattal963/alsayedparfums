@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, ShoppingBag, Search, User, LogOut, Shield } from 'lucide-react';
+import { Menu, X, ShoppingBag, Search, User, LogOut, Shield, UserCircle } from 'lucide-react';
+import ThemeToggle from '@/components/ThemeToggle';
 import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
@@ -130,6 +131,11 @@ const Header = () => {
               )}
             </button>
 
+            {/* Theme Toggle */}
+            <div className="hidden lg:block">
+              <ThemeToggle />
+            </div>
+
             {/* Admin Link */}
             {isAdmin && (
               <Link
@@ -144,18 +150,30 @@ const Header = () => {
               </Link>
             )}
 
-            {/* Auth Button */}
+            {/* User Profile & Auth */}
             {user ? (
-              <button
-                onClick={() => signOut()}
-                className={cn(
-                  'hidden lg:flex items-center gap-2 transition-colors duration-300 hover:text-gold text-sm',
-                  textColor
-                )}
-                aria-label="Sign Out"
-              >
-                <LogOut className="w-5 h-5" />
-              </button>
+              <div className="hidden lg:flex items-center gap-4">
+                <Link
+                  to="/profile"
+                  className={cn(
+                    'flex items-center gap-2 transition-colors duration-300 hover:text-gold text-sm',
+                    textColor
+                  )}
+                  aria-label="Profile"
+                >
+                  <UserCircle className="w-5 h-5" />
+                </Link>
+                <button
+                  onClick={() => signOut()}
+                  className={cn(
+                    'flex items-center gap-2 transition-colors duration-300 hover:text-gold text-sm',
+                    textColor
+                  )}
+                  aria-label="Sign Out"
+                >
+                  <LogOut className="w-5 h-5" />
+                </button>
+              </div>
             ) : (
               <Link
                 to="/auth"
@@ -203,31 +221,45 @@ const Header = () => {
             </Link>
           ))}
           
+          {/* Mobile Theme Toggle */}
+          <div className="animate-fade-in" style={{ animationDelay: `${navLinks.length * 100}ms` }}>
+            <ThemeToggle />
+          </div>
+
           {/* Mobile Admin Link */}
           {isAdmin && (
             <Link
               to="/admin"
               className="text-2xl font-display tracking-widest uppercase transition-all duration-300 hover:text-gold text-gold animate-fade-in"
-              style={{ animationDelay: `${navLinks.length * 100}ms` }}
+              style={{ animationDelay: `${(navLinks.length + 1) * 100}ms` }}
             >
               لوحة التحكم
             </Link>
           )}
           
-          {/* Mobile Auth Link */}
+          {/* Mobile Profile & Auth Links */}
           {user ? (
-            <button
-              onClick={() => signOut()}
-              className="text-2xl font-display tracking-widest uppercase transition-all duration-300 hover:text-gold text-foreground animate-fade-in"
-              style={{ animationDelay: `${(navLinks.length + (isAdmin ? 1 : 0)) * 100}ms` }}
-            >
-              تسجيل خروج
-            </button>
+            <>
+              <Link
+                to="/profile"
+                className="text-2xl font-display tracking-widest uppercase transition-all duration-300 hover:text-gold text-foreground animate-fade-in"
+                style={{ animationDelay: `${(navLinks.length + (isAdmin ? 2 : 1)) * 100}ms` }}
+              >
+                حسابي
+              </Link>
+              <button
+                onClick={() => signOut()}
+                className="text-2xl font-display tracking-widest uppercase transition-all duration-300 hover:text-gold text-foreground animate-fade-in"
+                style={{ animationDelay: `${(navLinks.length + (isAdmin ? 3 : 2)) * 100}ms` }}
+              >
+                تسجيل خروج
+              </button>
+            </>
           ) : (
             <Link
               to="/auth"
               className="text-2xl font-display tracking-widest uppercase transition-all duration-300 hover:text-gold text-foreground animate-fade-in"
-              style={{ animationDelay: `${navLinks.length * 100}ms` }}
+              style={{ animationDelay: `${(navLinks.length + 1) * 100}ms` }}
             >
               تسجيل دخول
             </Link>
