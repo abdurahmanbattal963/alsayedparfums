@@ -115,6 +115,60 @@ export type Database = {
         }
         Relationships: []
       }
+      products: {
+        Row: {
+          base_notes: string[] | null
+          category: string
+          created_at: string
+          description_ar: string | null
+          description_en: string | null
+          heart_notes: string[] | null
+          id: string
+          image_url: string | null
+          is_featured: boolean
+          name_ar: string
+          name_en: string
+          sizes: Json
+          slug: string
+          top_notes: string[] | null
+          updated_at: string
+        }
+        Insert: {
+          base_notes?: string[] | null
+          category: string
+          created_at?: string
+          description_ar?: string | null
+          description_en?: string | null
+          heart_notes?: string[] | null
+          id?: string
+          image_url?: string | null
+          is_featured?: boolean
+          name_ar: string
+          name_en: string
+          sizes?: Json
+          slug: string
+          top_notes?: string[] | null
+          updated_at?: string
+        }
+        Update: {
+          base_notes?: string[] | null
+          category?: string
+          created_at?: string
+          description_ar?: string | null
+          description_en?: string | null
+          heart_notes?: string[] | null
+          id?: string
+          image_url?: string | null
+          is_featured?: boolean
+          name_ar?: string
+          name_en?: string
+          sizes?: Json
+          slug?: string
+          top_notes?: string[] | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           address: string | null
