@@ -3,9 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Package, Users, ShoppingBag, TrendingUp } from 'lucide-react';
+import { Package, Users, ShoppingBag } from 'lucide-react';
 import OrdersTable from '@/components/admin/OrdersTable';
 import CustomersTable from '@/components/admin/CustomersTable';
+import ProductsTable from '@/components/admin/ProductsTable';
 import AdminStats from '@/components/admin/AdminStats';
 
 const AdminPage = () => {
@@ -82,6 +83,10 @@ const AdminPage = () => {
               <Package className="w-4 h-4 mr-2" />
               Orders
             </TabsTrigger>
+            <TabsTrigger value="products" className="data-[state=active]:bg-gold data-[state=active]:text-primary">
+              <ShoppingBag className="w-4 h-4 mr-2" />
+              Products
+            </TabsTrigger>
             <TabsTrigger value="customers" className="data-[state=active]:bg-gold data-[state=active]:text-primary">
               <Users className="w-4 h-4 mr-2" />
               Customers
@@ -90,6 +95,10 @@ const AdminPage = () => {
 
           <TabsContent value="orders" className="mt-6">
             <OrdersTable />
+          </TabsContent>
+
+          <TabsContent value="products" className="mt-6">
+            <ProductsTable />
           </TabsContent>
 
           <TabsContent value="customers" className="mt-6">
