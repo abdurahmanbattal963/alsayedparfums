@@ -1,17 +1,37 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, ShoppingBag, Search, User, LogOut } from 'lucide-react';
+import { Menu, X, ShoppingBag, Search, User, LogOut, Shield } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/integrations/supabase/client';
 import { cn } from '@/lib/utils';
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   const { getCartCount, openCart } = useCart();
   const { user, signOut } = useAuth();
   const location = useLocation();
   const cartCount = getCartCount();
+
+  useEffect(() => {
+    const checkAdminRole = async () => {
+      if (!user) {
+        setIsAdmin(false);
+        return;
+      }
+
+      const { data } = await supabase.rpc('has_role', {
+        _user_id: user.id,
+        _role: 'admin',
+      });
+
+      setIsAdmin(data || false);
+    };
+
+    checkAdminRole();
+  }, [user]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -110,6 +130,20 @@ const Header = () => {
               )}
             </button>
 
+            {/* Admin Link */}
+            {isAdmin && (
+              <Link
+                to="/admin"
+                className={cn(
+                  'hidden lg:flex items-center gap-2 transition-colors duration-300 hover:text-gold text-sm',
+                  textColor
+                )}
+                aria-label="Admin Dashboard"
+              >
+                <Shield className="w-5 h-5" />
+              </Link>
+            )}
+
             {/* Auth Button */}
             {user ? (
               <button
@@ -169,12 +203,23 @@ const Header = () => {
             </Link>
           ))}
           
+          {/* Mobile Admin Link */}
+          {isAdmin && (
+            <Link
+              to="/admin"
+              className="text-2xl font-display tracking-widest uppercase transition-all duration-300 hover:text-gold text-gold animate-fade-in"
+              style={{ animationDelay: `${navLinks.length * 100}ms` }}
+            >
+              لوحة التحكم
+            </Link>
+          )}
+          
           {/* Mobile Auth Link */}
           {user ? (
             <button
               onClick={() => signOut()}
               className="text-2xl font-display tracking-widest uppercase transition-all duration-300 hover:text-gold text-foreground animate-fade-in"
-              style={{ animationDelay: `${navLinks.length * 100}ms` }}
+              style={{ animationDelay: `${(navLinks.length + (isAdmin ? 1 : 0)) * 100}ms` }}
             >
               تسجيل خروج
             </button>
