@@ -1,13 +1,14 @@
 import { useState, useMemo } from 'react';
-import { Search, SlidersHorizontal, X } from 'lucide-react';
+import { Search, SlidersHorizontal, X, Loader2 } from 'lucide-react';
 import ProductCard from '@/components/product/ProductCard';
-import { products, Product } from '@/data/products';
+import { useProducts, Product } from '@/hooks/useProducts';
 import { cn } from '@/lib/utils';
 
 type Category = 'all' | 'men' | 'women' | 'unisex';
 type SortOption = 'newest' | 'price-low' | 'price-high' | 'name';
 
 const ShopPage = () => {
+  const { data: products = [], isLoading, error } = useProducts();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<Category>('all');
   const [sortBy, setSortBy] = useState<SortOption>('newest');
@@ -49,6 +50,7 @@ const ShopPage = () => {
 
     // Filter by price range
     result = result.filter((p) => {
+      if (p.sizes.length === 0) return true;
       const minPrice = Math.min(...p.sizes.map((s) => s.price));
       return minPrice >= priceRange[0] && minPrice <= priceRange[1];
     });
@@ -60,15 +62,15 @@ const ShopPage = () => {
         break;
       case 'price-low':
         result.sort((a, b) => {
-          const aMin = Math.min(...a.sizes.map((s) => s.price));
-          const bMin = Math.min(...b.sizes.map((s) => s.price));
+          const aMin = a.sizes.length > 0 ? Math.min(...a.sizes.map((s) => s.price)) : 0;
+          const bMin = b.sizes.length > 0 ? Math.min(...b.sizes.map((s) => s.price)) : 0;
           return aMin - bMin;
         });
         break;
       case 'price-high':
         result.sort((a, b) => {
-          const aMin = Math.min(...a.sizes.map((s) => s.price));
-          const bMin = Math.min(...b.sizes.map((s) => s.price));
+          const aMin = a.sizes.length > 0 ? Math.min(...a.sizes.map((s) => s.price)) : 0;
+          const bMin = b.sizes.length > 0 ? Math.min(...b.sizes.map((s) => s.price)) : 0;
           return bMin - aMin;
         });
         break;
@@ -78,7 +80,23 @@ const ShopPage = () => {
     }
 
     return result;
-  }, [searchQuery, selectedCategory, sortBy, priceRange]);
+  }, [products, searchQuery, selectedCategory, sortBy, priceRange]);
+
+  if (isLoading) {
+    return (
+      <main className="min-h-screen pt-24 lg:pt-32 pb-20 flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-gold" />
+      </main>
+    );
+  }
+
+  if (error) {
+    return (
+      <main className="min-h-screen pt-24 lg:pt-32 pb-20 flex items-center justify-center">
+        <p className="text-destructive">Failed to load products</p>
+      </main>
+    );
+  }
 
   return (
     <main className="min-h-screen pt-24 lg:pt-32 pb-20">

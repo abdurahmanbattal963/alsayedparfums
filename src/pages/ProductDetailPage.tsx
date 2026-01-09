@@ -1,23 +1,38 @@
-import { useState } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
-import { ChevronLeft, ChevronRight, Minus, Plus, ShoppingBag, Heart, Truck, Shield, RotateCcw } from 'lucide-react';
-import { getProductBySlug, getFeaturedProducts } from '@/data/products';
+import { useState, useEffect } from 'react';
+import { useParams, Link } from 'react-router-dom';
+import { ChevronLeft, ChevronRight, Minus, Plus, ShoppingBag, Heart, Truck, Shield, RotateCcw, Loader2 } from 'lucide-react';
+import { useProduct, useFeaturedProducts } from '@/hooks/useProducts';
 import { useCart } from '@/context/CartContext';
 import ProductCard from '@/components/product/ProductCard';
 import { cn } from '@/lib/utils';
 
 const ProductDetailPage = () => {
   const { slug } = useParams<{ slug: string }>();
-  const navigate = useNavigate();
   const { addItem, openCart } = useCart();
-  const product = slug ? getProductBySlug(slug) : undefined;
+  const { data: product, isLoading, error } = useProduct(slug);
+  const { data: featuredProducts = [] } = useFeaturedProducts();
 
-  const [selectedSize, setSelectedSize] = useState(product?.sizes[0] || null);
+  const [selectedSize, setSelectedSize] = useState<{ size: string; price: number; stock: number } | null>(null);
   const [quantity, setQuantity] = useState(1);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [isAddingToCart, setIsAddingToCart] = useState(false);
 
-  if (!product) {
+  // Set default size when product loads
+  useEffect(() => {
+    if (product && product.sizes.length > 0 && !selectedSize) {
+      setSelectedSize(product.sizes[0]);
+    }
+  }, [product, selectedSize]);
+
+  if (isLoading) {
+    return (
+      <main className="min-h-screen pt-32 pb-20 flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-gold" />
+      </main>
+    );
+  }
+
+  if (error || !product) {
     return (
       <main className="min-h-screen pt-32 pb-20">
         <div className="container mx-auto px-4 lg:px-8 text-center">
@@ -33,7 +48,7 @@ const ProductDetailPage = () => {
     );
   }
 
-  const relatedProducts = getFeaturedProducts()
+  const relatedProducts = featuredProducts
     .filter((p) => p.id !== product.id)
     .slice(0, 4);
 
@@ -97,47 +112,53 @@ const ProductDetailPage = () => {
               />
 
               {/* Navigation Arrows */}
-              <button
-                onClick={() =>
-                  setActiveImageIndex((prev) =>
-                    prev === 0 ? product.images.length - 1 : prev - 1
-                  )
-                }
-                className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-background/90 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-gold hover:text-primary"
-              >
-                <ChevronLeft className="w-5 h-5" />
-              </button>
-              <button
-                onClick={() =>
-                  setActiveImageIndex((prev) =>
-                    prev === product.images.length - 1 ? 0 : prev + 1
-                  )
-                }
-                className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-background/90 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-gold hover:text-primary"
-              >
-                <ChevronRight className="w-5 h-5" />
-              </button>
+              {product.images.length > 1 && (
+                <>
+                  <button
+                    onClick={() =>
+                      setActiveImageIndex((prev) =>
+                        prev === 0 ? product.images.length - 1 : prev - 1
+                      )
+                    }
+                    className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-background/90 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-gold hover:text-primary"
+                  >
+                    <ChevronLeft className="w-5 h-5" />
+                  </button>
+                  <button
+                    onClick={() =>
+                      setActiveImageIndex((prev) =>
+                        prev === product.images.length - 1 ? 0 : prev + 1
+                      )
+                    }
+                    className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-background/90 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-gold hover:text-primary"
+                  >
+                    <ChevronRight className="w-5 h-5" />
+                  </button>
+                </>
+              )}
             </div>
 
             {/* Thumbnails */}
-            <div className="grid grid-cols-4 gap-3">
-              {product.images.map((image, index) => (
-                <button
-                  key={index}
-                  onClick={() => setActiveImageIndex(index)}
-                  className={cn(
-                    'aspect-square bg-muted overflow-hidden border-2 transition-colors',
-                    activeImageIndex === index ? 'border-gold' : 'border-transparent'
-                  )}
-                >
-                  <img
-                    src={image}
-                    alt={`${product.nameEn} ${index + 1}`}
-                    className="w-full h-full object-cover"
-                  />
-                </button>
-              ))}
-            </div>
+            {product.images.length > 1 && (
+              <div className="grid grid-cols-4 gap-3">
+                {product.images.map((image, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setActiveImageIndex(index)}
+                    className={cn(
+                      'aspect-square bg-muted overflow-hidden border-2 transition-colors',
+                      activeImageIndex === index ? 'border-gold' : 'border-transparent'
+                    )}
+                  >
+                    <img
+                      src={image}
+                      alt={`${product.nameEn} ${index + 1}`}
+                      className="w-full h-full object-cover"
+                    />
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Product Info */}
@@ -156,7 +177,7 @@ const ProductDetailPage = () => {
             {/* Price */}
             <div>
               <p className="text-3xl font-display text-gold">
-                {selectedSize ? formatPrice(selectedSize.price) : formatPrice(product.sizes[0].price)}
+                {selectedSize ? formatPrice(selectedSize.price) : (product.sizes.length > 0 ? formatPrice(product.sizes[0].price) : '$0')}
               </p>
               <p className="text-sm text-muted-foreground mt-1">Tax included</p>
             </div>
@@ -167,72 +188,82 @@ const ProductDetailPage = () => {
             </p>
 
             {/* Fragrance Notes */}
-            <div className="space-y-4">
-              <h3 className="text-sm font-semibold tracking-widest uppercase">
-                Fragrance Profile
-              </h3>
-              <div className="grid grid-cols-3 gap-4">
-                <div className="text-center p-4 bg-muted/50">
-                  <p className="text-xs text-muted-foreground uppercase tracking-wide mb-2">
-                    Top Notes
-                  </p>
-                  <p className="text-sm font-medium">
-                    {product.topNotes.join(', ')}
-                  </p>
-                </div>
-                <div className="text-center p-4 bg-muted/50">
-                  <p className="text-xs text-muted-foreground uppercase tracking-wide mb-2">
-                    Heart Notes
-                  </p>
-                  <p className="text-sm font-medium">
-                    {product.heartNotes.join(', ')}
-                  </p>
-                </div>
-                <div className="text-center p-4 bg-muted/50">
-                  <p className="text-xs text-muted-foreground uppercase tracking-wide mb-2">
-                    Base Notes
-                  </p>
-                  <p className="text-sm font-medium">
-                    {product.baseNotes.join(', ')}
-                  </p>
+            {(product.topNotes.length > 0 || product.heartNotes.length > 0 || product.baseNotes.length > 0) && (
+              <div className="space-y-4">
+                <h3 className="text-sm font-semibold tracking-widest uppercase">
+                  Fragrance Profile
+                </h3>
+                <div className="grid grid-cols-3 gap-4">
+                  {product.topNotes.length > 0 && (
+                    <div className="text-center p-4 bg-muted/50">
+                      <p className="text-xs text-muted-foreground uppercase tracking-wide mb-2">
+                        Top Notes
+                      </p>
+                      <p className="text-sm font-medium">
+                        {product.topNotes.join(', ')}
+                      </p>
+                    </div>
+                  )}
+                  {product.heartNotes.length > 0 && (
+                    <div className="text-center p-4 bg-muted/50">
+                      <p className="text-xs text-muted-foreground uppercase tracking-wide mb-2">
+                        Heart Notes
+                      </p>
+                      <p className="text-sm font-medium">
+                        {product.heartNotes.join(', ')}
+                      </p>
+                    </div>
+                  )}
+                  {product.baseNotes.length > 0 && (
+                    <div className="text-center p-4 bg-muted/50">
+                      <p className="text-xs text-muted-foreground uppercase tracking-wide mb-2">
+                        Base Notes
+                      </p>
+                      <p className="text-sm font-medium">
+                        {product.baseNotes.join(', ')}
+                      </p>
+                    </div>
+                  )}
                 </div>
               </div>
-            </div>
+            )}
 
             {/* Size Selection */}
-            <div className="space-y-4">
-              <h3 className="text-sm font-semibold tracking-widest uppercase">
-                Select Size
-              </h3>
-              <div className="flex gap-3">
-                {product.sizes.map((size) => (
-                  <button
-                    key={size.size}
-                    onClick={() => setSelectedSize(size)}
-                    disabled={size.stock === 0}
-                    className={cn(
-                      'px-6 py-3 border text-sm font-medium transition-all duration-300',
-                      selectedSize?.size === size.size
-                        ? 'border-gold bg-gold text-primary'
-                        : 'border-border hover:border-gold',
-                      size.stock === 0 && 'opacity-50 cursor-not-allowed line-through'
-                    )}
-                  >
-                    {size.size}
-                    <span className="block text-xs mt-1">
-                      {formatPrice(size.price)}
-                    </span>
-                  </button>
-                ))}
+            {product.sizes.length > 0 && (
+              <div className="space-y-4">
+                <h3 className="text-sm font-semibold tracking-widest uppercase">
+                  Select Size
+                </h3>
+                <div className="flex gap-3">
+                  {product.sizes.map((size) => (
+                    <button
+                      key={size.size}
+                      onClick={() => setSelectedSize(size)}
+                      disabled={size.stock === 0}
+                      className={cn(
+                        'px-6 py-3 border text-sm font-medium transition-all duration-300',
+                        selectedSize?.size === size.size
+                          ? 'border-gold bg-gold text-primary'
+                          : 'border-border hover:border-gold',
+                        size.stock === 0 && 'opacity-50 cursor-not-allowed line-through'
+                      )}
+                    >
+                      {size.size}
+                      <span className="block text-xs mt-1">
+                        {formatPrice(size.price)}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+                {selectedSize && (
+                  <p className="text-xs text-muted-foreground">
+                    {selectedSize.stock > 0
+                      ? `${selectedSize.stock} in stock`
+                      : 'Out of stock'}
+                  </p>
+                )}
               </div>
-              {selectedSize && (
-                <p className="text-xs text-muted-foreground">
-                  {selectedSize.stock > 0
-                    ? `${selectedSize.stock} in stock`
-                    : 'Out of stock'}
-                </p>
-              )}
-            </div>
+            )}
 
             {/* Quantity & Add to Cart */}
             <div className="flex gap-4">

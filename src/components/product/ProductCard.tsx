@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ShoppingBag, Eye } from 'lucide-react';
-import { Product } from '@/data/products';
+import { Product } from '@/hooks/useProducts';
 import { useCart } from '@/context/CartContext';
 import { cn } from '@/lib/utils';
 
@@ -14,7 +14,7 @@ const ProductCard = ({ product, index = 0 }: ProductCardProps) => {
   const [isHovered, setIsHovered] = useState(false);
   const { addItem, openCart } = useCart();
 
-  const lowestPrice = Math.min(...product.sizes.map((s) => s.price));
+  const lowestPrice = product.sizes.length > 0 ? Math.min(...product.sizes.map((s) => s.price)) : 0;
   const defaultSize = product.sizes[0];
 
   const formatPrice = (price: number) => {
@@ -27,6 +27,7 @@ const ProductCard = ({ product, index = 0 }: ProductCardProps) => {
   const handleQuickAdd = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    if (!defaultSize) return;
     addItem(product.id, defaultSize.size, defaultSize.price);
     openCart();
   };
@@ -81,26 +82,28 @@ const ProductCard = ({ product, index = 0 }: ProductCardProps) => {
           )}
 
           {/* Quick Actions */}
-          <div
-            className={cn(
-              'absolute bottom-4 left-4 right-4 flex gap-2 transition-all duration-500',
-              isHovered ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
-            )}
-          >
-            <button
-              onClick={handleQuickAdd}
-              className="flex-1 bg-background/95 backdrop-blur-sm text-foreground py-3 text-xs tracking-widest uppercase font-medium flex items-center justify-center gap-2 hover:bg-gold hover:text-primary transition-all duration-300"
+          {defaultSize && (
+            <div
+              className={cn(
+                'absolute bottom-4 left-4 right-4 flex gap-2 transition-all duration-500',
+                isHovered ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+              )}
             >
-              <ShoppingBag className="w-4 h-4" />
-              Add to Cart
-            </button>
-            <Link
-              to={`/product/${product.slug}`}
-              className="bg-background/95 backdrop-blur-sm text-foreground p-3 hover:bg-gold hover:text-primary transition-all duration-300"
-            >
-              <Eye className="w-4 h-4" />
-            </Link>
-          </div>
+              <button
+                onClick={handleQuickAdd}
+                className="flex-1 bg-background/95 backdrop-blur-sm text-foreground py-3 text-xs tracking-widest uppercase font-medium flex items-center justify-center gap-2 hover:bg-gold hover:text-primary transition-all duration-300"
+              >
+                <ShoppingBag className="w-4 h-4" />
+                Add to Cart
+              </button>
+              <Link
+                to={`/product/${product.slug}`}
+                className="bg-background/95 backdrop-blur-sm text-foreground p-3 hover:bg-gold hover:text-primary transition-all duration-300"
+              >
+                <Eye className="w-4 h-4" />
+              </Link>
+            </div>
+          )}
         </div>
 
         {/* Product Info */}
@@ -110,7 +113,7 @@ const ProductCard = ({ product, index = 0 }: ProductCardProps) => {
             {product.nameEn}
           </h3>
           <p className="text-sm text-muted-foreground">
-            From {formatPrice(lowestPrice)}
+            {lowestPrice > 0 ? `From ${formatPrice(lowestPrice)}` : 'Price on request'}
           </p>
         </div>
       </Link>
