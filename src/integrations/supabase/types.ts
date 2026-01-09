@@ -58,6 +58,7 @@ export type Database = {
       orders: {
         Row: {
           created_at: string
+          guest_token: string | null
           id: string
           notes: string | null
           order_number: string
@@ -77,6 +78,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          guest_token?: string | null
           id?: string
           notes?: string | null
           order_number: string
@@ -96,6 +98,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          guest_token?: string | null
           id?: string
           notes?: string | null
           order_number?: string

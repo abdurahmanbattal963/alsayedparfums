@@ -9,7 +9,7 @@ interface OrderItem {
 }
 
 interface CreateOrderParams {
-  userId?: string;
+  userId: string; // Required - no guest checkout
   orderNumber: string;
   subtotal: number;
   shipping: number;
@@ -28,11 +28,11 @@ interface CreateOrderParams {
 export const createOrder = async (params: CreateOrderParams) => {
   const { items, ...orderData } = params;
 
-  // Insert order
+  // Insert order - userId is required
   const { data: order, error: orderError } = await supabase
     .from('orders')
     .insert({
-      user_id: orderData.userId || null,
+      user_id: orderData.userId,
       order_number: orderData.orderNumber,
       subtotal: orderData.subtotal,
       shipping: orderData.shipping,
