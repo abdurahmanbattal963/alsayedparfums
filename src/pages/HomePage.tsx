@@ -1,11 +1,13 @@
 import { Link } from 'react-router-dom';
-import { ArrowRight, Sparkles, Shield, Truck, Award } from 'lucide-react';
+import { ArrowRight, Sparkles, Shield, Truck, Award, Loader2 } from 'lucide-react';
 import ProductCard from '@/components/product/ProductCard';
-import { getFeaturedProducts } from '@/data/products';
+import { useFeaturedProducts } from '@/hooks/useProducts';
 import heroBg from '@/assets/hero-bg.jpg';
 import heroPerfume from '@/assets/hero-perfume.jpg';
+
 const HomePage = () => {
-  const featuredProducts = getFeaturedProducts();
+  const { data: featuredProducts = [], isLoading } = useFeaturedProducts();
+  
   const features = [{
     icon: Sparkles,
     title: 'Premium Quality',
@@ -27,7 +29,9 @@ const HomePage = () => {
     titleAr: 'اختيار متخصص',
     description: 'Hand-selected by world-renowned perfume experts'
   }];
-  return <main className="min-h-screen">
+
+  return (
+    <main className="min-h-screen">
       {/* Hero Section */}
       <section className="relative h-screen flex items-center justify-center overflow-hidden">
         {/* Background Image */}
@@ -40,23 +44,23 @@ const HomePage = () => {
         <div className="relative z-10 container mx-auto px-4 lg:px-8">
           <div className="max-w-3xl">
             <p className="text-gold font-arabic text-xl mb-4 animate-fade-in opacity-0" style={{
-            animationDelay: '0.2s',
-            animationFillMode: 'forwards'
-          }}>
+              animationDelay: '0.2s',
+              animationFillMode: 'forwards'
+            }}>
               عطور تُجسد الفخامة والذوق الرفيع
             </p>
             <h1 className="text-5xl md:text-7xl lg:text-8xl font-display font-bold text-white mb-6 tracking-wide animate-fade-in opacity-0" style={{
-            animationDelay: '0.4s',
-            animationFillMode: 'forwards'
-          }}>
+              animationDelay: '0.4s',
+              animationFillMode: 'forwards'
+            }}>
               ALSAYED
               <span className="block text-gold">PERFUMES</span>
             </h1>
             
             <div className="flex flex-wrap gap-4 animate-fade-in opacity-0" style={{
-            animationDelay: '0.8s',
-            animationFillMode: 'forwards'
-          }}>
+              animationDelay: '0.8s',
+              animationFillMode: 'forwards'
+            }}>
               <Link to="/shop" className="btn-gold group inline-flex items-center gap-3">
                 Explore Collection
                 <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
@@ -67,9 +71,6 @@ const HomePage = () => {
             </div>
           </div>
         </div>
-
-        {/* Scroll Indicator */}
-        
       </section>
 
       {/* Featured Perfume Section */}
@@ -123,9 +124,19 @@ const HomePage = () => {
             <div className="luxury-divider mt-6" />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {featuredProducts.map((product, index) => <ProductCard key={product.id} product={product} index={index} />)}
-          </div>
+          {isLoading ? (
+            <div className="flex justify-center py-12">
+              <Loader2 className="w-8 h-8 animate-spin text-gold" />
+            </div>
+          ) : featuredProducts.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+              {featuredProducts.map((product, index) => (
+                <ProductCard key={product.id} product={product} index={index} />
+              ))}
+            </div>
+          ) : (
+            <p className="text-center text-muted-foreground">No featured products available</p>
+          )}
 
           <div className="text-center mt-16">
             <Link to="/shop" className="btn-luxury inline-flex items-center gap-3 group">
@@ -152,9 +163,12 @@ const HomePage = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {features.map((feature, index) => <div key={feature.title} className="text-center p-8 border border-primary-foreground/10 hover:border-gold/50 transition-all duration-500 animate-fade-in group" style={{
-            animationDelay: `${index * 100}ms`
-          }}>
+            {features.map((feature, index) => (
+              <div 
+                key={feature.title} 
+                className="text-center p-8 border border-primary-foreground/10 hover:border-gold/50 transition-all duration-500 animate-fade-in group" 
+                style={{ animationDelay: `${index * 100}ms` }}
+              >
                 <div className="inline-flex items-center justify-center w-16 h-16 mb-6 border border-gold/30 group-hover:border-gold transition-colors duration-500">
                   <feature.icon className="w-7 h-7 text-gold" />
                 </div>
@@ -163,7 +177,8 @@ const HomePage = () => {
                 <p className="text-sm text-primary-foreground/60 leading-relaxed">
                   {feature.description}
                 </p>
-              </div>)}
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -197,6 +212,8 @@ const HomePage = () => {
           </div>
         </div>
       </section>
-    </main>;
+    </main>
+  );
 };
+
 export default HomePage;
