@@ -8,6 +8,7 @@ import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { countries } from '@/data/countries';
+import { orderValidationSchema } from '@/lib/validation';
 
 type PaymentMethod = 'cod' | 'bank';
 
@@ -52,6 +53,23 @@ const CheckoutPage = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Require authentication for checkout
+    if (!user) {
+      toast.error('Please sign in to complete your order');
+      navigate('/auth');
+      return;
+    }
+    
+    // Validate form data with zod schema
+    const validationResult = orderValidationSchema.safeParse(formData);
+    if (!validationResult.success) {
+      const firstError = validationResult.error.errors[0];
+      toast.error(firstError.message);
+      return;
+    }
+    
+    const validatedData = validationResult.data;
     setIsProcessing(true);
 
     try {
@@ -68,32 +86,32 @@ const CheckoutPage = () => {
         };
       });
 
-      const selectedCountry = countries.find(c => c.code === formData.country);
+      const selectedCountry = countries.find(c => c.code === validatedData.country);
       
       await createOrder({
-        userId: user?.id,
+        userId: user.id,
         orderNumber,
         subtotal,
         shipping,
         total,
         paymentMethod: paymentMethod === 'cod' ? 'Cash on Delivery' : 'Bank Transfer',
-        shippingName: `${formData.firstName} ${formData.lastName}`,
-        shippingPhone: formData.phone,
-        shippingEmail: formData.email,
-        shippingAddress: formData.address,
-        shippingEmirate: selectedCountry?.nameEn || formData.country,
-        shippingCity: formData.city,
-        notes: formData.notes,
+        shippingName: `${validatedData.firstName} ${validatedData.lastName}`,
+        shippingPhone: validatedData.phone,
+        shippingEmail: validatedData.email,
+        shippingAddress: validatedData.address,
+        shippingEmirate: selectedCountry?.nameEn || validatedData.country,
+        shippingCity: validatedData.city,
+        notes: validatedData.notes || '',
         items: orderItems,
       });
 
       // Send order confirmation email
       try {
-        const shippingAddress = `${formData.address}, ${formData.city}, ${selectedCountry?.nameEn || formData.country}`;
+        const shippingAddressForEmail = `${validatedData.address}, ${validatedData.city}, ${selectedCountry?.nameEn || validatedData.country}`;
         await supabase.functions.invoke('send-order-confirmation', {
           body: {
-            customerName: `${formData.firstName} ${formData.lastName}`,
-            customerEmail: formData.email,
+            customerName: `${validatedData.firstName} ${validatedData.lastName}`,
+            customerEmail: validatedData.email,
             orderNumber,
             items: orderItems.map(item => ({
               productName: item.productName,
@@ -104,14 +122,12 @@ const CheckoutPage = () => {
             subtotal,
             shipping,
             total,
-            shippingAddress,
+            shippingAddress: shippingAddressForEmail,
             paymentMethod: paymentMethod === 'cod' ? 'Cash on Delivery' : 'Bank Transfer',
           },
         });
-        console.log('Order confirmation email sent');
       } catch (emailError) {
-        console.error('Failed to send confirmation email:', emailError);
-        // Don't fail the order if email fails
+        // Don't fail the order if email fails - silently continue
       }
 
       setOrderId(orderNumber);
@@ -119,7 +135,6 @@ const CheckoutPage = () => {
       clearCart();
       toast.success('Order placed successfully!');
     } catch (error) {
-      console.error('Error creating order:', error);
       toast.error('Failed to place order. Please try again.');
     } finally {
       setIsProcessing(false);
